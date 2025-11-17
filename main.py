@@ -176,7 +176,7 @@ def load_config():
         "ntfy_topic", ""
     )
     config["NTFY_TOKEN"] = os.environ.get("NTFY_TOKEN", "").strip() or webhooks.get(
-        "ntfy_token"， ""
+        "ntfy_token", ""
     )
 
     # 输出配置来源信息
