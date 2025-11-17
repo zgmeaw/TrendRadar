@@ -201,11 +201,11 @@ def load_config():
         notification_sources.append(f"邮件({from_source})")
 
     if config["NTFY_SERVER_URL"] and config["NTFY_TOPIC"]:
-        server_source = "环境变量" if os.environ。get("NTFY_SERVER_URL") else "配置文件"
+        server_source = "环境变量" if os.environ.get("NTFY_SERVER_URL") else "配置文件"
         notification_sources.append(f"ntfy({server_source})")
 
     if notification_sources:
-        print(f"通知渠道配置来源: {', '。join(notification_sources)}")
+        print(f"通知渠道配置来源: {', '.join(notification_sources)}")
     else:
         print("未配置任何通知渠道")
 
@@ -231,7 +231,7 @@ def format_date_folder():
 
 def format_time_filename():
     """格式化时间文件名"""
-    return get_beijing_time()。strftime("%H时%M分")
+    return get_beijing_time().strftime("%H时%M分")
 
 
 def clean_title(title: str) -> str:
@@ -338,7 +338,7 @@ class PushRecordManager:
 
     def ensure_record_dir(self):
         """确保记录目录存在"""
-        self.record_dir。mkdir(parents=True, exist_ok=True)
+        self.record_dir.mkdir(parents=True, exist_ok=True)
 
     def get_today_record_file(self) -> Path:
         """获取今天的记录文件路径"""
@@ -352,9 +352,9 @@ class PushRecordManager:
 
         for record_file in self.record_dir.glob("push_record_*.json"):
             try:
-                date_str = record_file.stem。替换("push_record_", "")
+                date_str = record_file.stem.replace("push_record_", "")
                 file_date = datetime.strptime(date_str, "%Y%m%d")
-                file_date = pytz.timezone("Asia/Shanghai")。localize(file_date)
+                file_date = pytz.timezone("Asia/Shanghai").localize(file_date)
 
                 if (current_time - file_date).days > retention_days:
                     record_file.unlink()
@@ -380,24 +380,24 @@ class PushRecordManager:
     def record_push(self, report_type: str):
         """记录推送"""
         record_file = self.get_today_record_file()
-        现在 = get_beijing_time()
+        now = get_beijing_time()
 
         record = {
             "pushed": True,
-            "push_time": now.strftime("%Y-%m-%d %H:%M:%S")，
+            "push_time": now.strftime("%Y-%m-%d %H:%M:%S"),
             "report_type": report_type,
         }
 
         try:
             with open(record_file, "w", encoding="utf-8") as f:
                 json.dump(record, f, ensure_ascii=False, indent=2)
-            print(f"推送记录已保存: {report_type} at {现在.strftime('%H:%M:%S')}")
+            print(f"推送记录已保存: {report_type} at {now.strftime('%H:%M:%S')}")
         except Exception as e:
             print(f"保存推送记录失败: {e}")
 
     def is_in_time_range(self, start_time: str, end_time: str) -> bool:
         """检查当前时间是否在指定时间范围内"""
-        现在 = get_beijing_time()
+        now = get_beijing_time()
         current_time = now.strftime("%H:%M")
     
         def normalize_time(time_str: str) -> str:
@@ -410,7 +410,7 @@ class PushRecordManager:
                 hour = int(parts[0])
                 minute = int(parts[1])
             
-                if not (0 <= hour <= 23 和 0 <= minute <= 59):
+                if not (0 <= hour <= 23 and 0 <= minute <= 59):
                     raise ValueError(f"时间范围错误: {time_str}")
             
                 return f"{hour:02d}:{minute:02d}"
@@ -1032,11 +1032,11 @@ def format_rank_display(ranks: List[int], rank_threshold: int, format_type: str)
 
 def count_word_frequency(
     results: Dict,
-    word_groups: List[Dict]，
-    filter_words: List[str]，
+    word_groups: List[Dict],
+    filter_words: List[str],
     id_to_name: Dict,
     title_info: Optional[Dict] = None,
-    rank_threshold: int = CONFIG["RANK_THRESHOLD"]，
+    rank_threshold: int = CONFIG["RANK_THRESHOLD"],
     new_titles: Optional[Dict] = None,
     mode: str = "daily",
 ) -> Tuple[List[Dict], int]:
@@ -1063,9 +1063,9 @@ def count_word_frequency(
     elif mode == "current":
         # current 模式：只处理当前时间批次的新闻，但统计信息来自全部历史
         if title_info:
-            latest_time = 无
+            latest_time = None
             for source_titles in title_info.values():
-                for title_data 在 source_titles.values():
+                for title_data in source_titles.values():
                     last_time = title_data.get("last_time", "")
                     if last_time:
                         if latest_time is None or last_time > latest_time:
@@ -1074,10 +1074,10 @@ def count_word_frequency(
             # 只处理 last_time 等于最新时间的新闻
             if latest_time:
                 results_to_process = {}
-                for source_id, source_titles 在 results.items():
+                for source_id, source_titles in results.items():
                     if source_id in title_info:
                         filtered_titles = {}
-                        for title, title_data 在 source_titles.items():
+                        for title, title_data in source_titles.items():
                             if title in title_info[source_id]:
                                 info = title_info[source_id][title]
                                 if info.get("last_time") == latest_time:
@@ -1125,8 +1125,8 @@ def count_word_frequency(
         if source_id not in processed_titles:
             processed_titles[source_id] = {}
 
-        for title, title_data 在 titles_data.items():
-            if title 在 processed_titles.get(source_id, {}):
+        for title, title_data in titles_data.items():
+            if title in processed_titles.get(source_id, {}):
                 continue
 
             # 使用统一的匹配逻辑
@@ -1144,12 +1144,12 @@ def count_word_frequency(
                 matched_new_count += 1
 
             source_ranks = title_data.get("ranks", [])
-            source_url = title_data.get("url"， "")
+            source_url = title_data.get("url", "")
             source_mobile_url = title_data.get("mobileUrl", "")
 
             # 找到匹配的词组
             title_lower = title.lower()
-            for group 在 word_groups:
+            for group in word_groups:
                 required_words = group["required"]
                 normal_words = group["normal"]
 
@@ -1162,8 +1162,8 @@ def count_word_frequency(
                 else:
                     # 原有的匹配逻辑
                     if required_words:
-                        all_required_present = 全部(
-                            req_word.lower() 在 title_lower
+                        all_required_present = all(
+                            req_word.lower() in title_lower
                             for req_word in required_words
                         )
                         if not all_required_present:
@@ -1172,7 +1172,7 @@ def count_word_frequency(
                     if normal_words:
                         any_normal_present = any(
                             normal_word.lower() in title_lower
-                            for normal_word 在 normal_words
+                            for normal_word in normal_words
                         )
                         if not any_normal_present:
                             continue
@@ -2847,7 +2847,7 @@ def split_content_into_batches(
     total_titles = sum(
         len(stat["titles"]) for stat in report_data["stats"] if stat["count"] > 0
     )
-    现在 = get_beijing_time()
+    now = get_beijing_time()
 
     base_header = ""
     if format_type == "wework":
